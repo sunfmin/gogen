@@ -37,7 +37,7 @@ func ExamplePackage_01Simple() {
 				if len(a) > 0 {
 					fmt.Println("yes")
 				} else if len(a) > 10 {
-					fmt.Println("yes!)
+					fmt.Println("yes!")
 				}			
 				`),
 		),
