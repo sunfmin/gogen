@@ -36,7 +36,7 @@ func (b *StructBuilder) AppendField(name, typ string, tags ...string) (r *Struct
 		If(len(tags) > 0,
 			RawCode("`"+strings.Join(tags, " ")+"`"),
 		),
-	).Separator(" "))
+	).Separator(" ", false))
 	return b
 }
 
@@ -69,11 +69,11 @@ func (b *StructBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 
 	buf := bytes.NewBuffer(nil)
 	buf.WriteString(fmt.Sprintf("\ntype %s struct {\n", b.name))
-	err = Fprint(buf, Codes(b.fields...).Separator("\n"), ctx)
+	err = Fprint(buf, Codes(b.fields...), ctx)
 	if err != nil {
 		return
 	}
-	buf.WriteString("\n}\n")
+	buf.WriteString("}\n")
 
 	for _, f := range b.funcs {
 		if fb, ok := f.(*FuncBuilder); ok {
@@ -89,7 +89,7 @@ func (b *StructBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 		}
 	}
 
-	err = Fprint(buf, Codes(b.funcs...).Separator("\n\n"), ctx)
+	err = Fprint(buf, Codes(b.funcs...), ctx)
 	if err != nil {
 		return
 	}

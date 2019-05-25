@@ -35,11 +35,10 @@ func (b *SwitchBlockBuilder) MarshalCode(ctx context.Context) (r []byte, err err
 		return
 	}
 	buf.WriteString(" {\n")
-	err = Fprint(buf, Codes(b.cases...).Separator("\n"), ctx)
+	err = Fprint(buf, Codes(b.cases...), ctx)
 	if err != nil {
 		panic(err)
 	}
-	buf.WriteString("\n")
 
 	err = Fprint(buf, b.defaultBlock, ctx)
 	if err != nil {

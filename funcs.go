@@ -68,11 +68,11 @@ func (b *FuncBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 
 	buf.WriteString(" {\n")
 
-	err = Fprint(buf, Codes(b.blocks...).Separator("\n"), ctx)
+	err = Fprint(buf, Codes(b.blocks...), ctx)
 	if err != nil {
 		return
 	}
-	buf.WriteString("\n}\n\n")
+	buf.WriteString("}\n\n")
 
 	r = buf.Bytes()
 	return

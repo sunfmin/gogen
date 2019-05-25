@@ -31,17 +31,21 @@ func (cf CodeFunc) MarshalCode(ctx context.Context) (r []byte, err error) {
 }
 
 type CodesBuilder struct {
-	cs  []Code
-	sep string
+	cs         []Code
+	sep        string
+	appendLast bool
 }
 
 func Codes(cs ...Code) (r *CodesBuilder) {
 	r = &CodesBuilder{cs: cs}
+	r.sep = "\n"
+	r.appendLast = true
 	return
 }
 
-func (b *CodesBuilder) Separator(sep string) (r *CodesBuilder) {
+func (b *CodesBuilder) Separator(sep string, appendLast bool) (r *CodesBuilder) {
 	b.sep = sep
+	b.appendLast = appendLast
 	return b
 }
 
@@ -61,7 +65,7 @@ func (b *CodesBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 		if err != nil {
 			return
 		}
-		if i+1 < l {
+		if b.appendLast || i+1 < l {
 			buf.WriteString(b.sep)
 		}
 	}

@@ -64,11 +64,11 @@ func (b *ConstBlockBuilder) MarshalCode(ctx context.Context) (r []byte, err erro
 		buf.WriteString(fmt.Sprintf("type %s %s\n", b.constType, b.toType))
 	}
 	buf.WriteString("const (\n")
-	err = Fprint(buf, Codes(b.consts...).Separator("\n"), ctx)
+	err = Fprint(buf, Codes(b.consts...), ctx)
 	if err != nil {
 		return
 	}
-	buf.WriteString("\n)\n")
+	buf.WriteString(")\n")
 
 	r = buf.Bytes()
 	return

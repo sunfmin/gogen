@@ -98,6 +98,7 @@ func nice() {
 	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
 		Object: "MyObject",
 	})
+
 }
 
 const age = 2
@@ -259,7 +260,6 @@ func main() {
 		fmt.Println("x > 10 and x < 20")
 	} else if x > 20 {
 		if x == 5 {
-
 		}
 		fmt.Println("x > 20")
 	} else {
@@ -376,6 +376,42 @@ const (
 	HTTPStatusCreated	HTTPStatus	= 201
 	HTTPStatusNotFound	HTTPStatus	= 404
 )
+`
+	diff := testingutils.PrettyJsonDiff(expected, f.MustString(context.Background()))
+
+	fmt.Println(diff)
+	//Output:
+	//
+
+}
+
+/*
+More about blocks
+*/
+func ExampleFile_08Blocks() {
+
+	vals := []string{"Newhope", "Empire", "Jedi"}
+
+	valsBlock := Codes().Separator(",\n", true)
+	for _, v := range vals {
+		valsBlock.Append(Block("$Type$Val", "$Type", "Episode", "$Val", v))
+	}
+
+	f := File("hello.go").Package("main").Blocks(
+		Block(`
+		var All$Type = []$Type {
+			$Vals
+		}
+		`, "$Type", "Episode").
+			VarBlock("$Vals", valsBlock),
+	)
+	expected := `package main
+
+var AllEpisode = []Episode{
+	EpisodeNewhope,
+	EpisodeEmpire,
+	EpisodeJedi,
+}
 `
 	diff := testingutils.PrettyJsonDiff(expected, f.MustString(context.Background()))
 

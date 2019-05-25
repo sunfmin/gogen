@@ -36,11 +36,11 @@ func (b *InterfaceBuilder) MarshalCode(ctx context.Context) (r []byte, err error
 
 	buf := bytes.NewBuffer(nil)
 	buf.WriteString(fmt.Sprintf("\ntype %s interface {\n", b.name))
-	err = Fprint(buf, Codes(b.funcDecls...).Separator("\n"), ctx)
+	err = Fprint(buf, Codes(b.funcDecls...), ctx)
 	if err != nil {
 		return
 	}
-	buf.WriteString("\n}\n")
+	buf.WriteString("}\n")
 	r = buf.Bytes()
 	return
 

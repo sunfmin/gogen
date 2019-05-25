@@ -57,11 +57,11 @@ func (b *IfBlockBuilder) MarshalCode(ctx context.Context) (r []byte, err error) 
 		return
 	}
 	buf.WriteString(" {\n")
-	err = Fprint(buf, Codes(b.ifBlock.blocks...).Separator("\n"), ctx)
+	err = Fprint(buf, Codes(b.ifBlock.blocks...), ctx)
 	if err != nil {
 		panic(err)
 	}
-	buf.WriteString("\n} ")
+	buf.WriteString("} ")
 
 	for _, elsIf := range b.elseIfBlocks {
 		err = Fprint(buf, elsIf.cond, ctx)
@@ -70,22 +70,22 @@ func (b *IfBlockBuilder) MarshalCode(ctx context.Context) (r []byte, err error) 
 		}
 
 		buf.WriteString(" {\n")
-		err = Fprint(buf, Codes(elsIf.blocks...).Separator("\n"), ctx)
+		err = Fprint(buf, Codes(elsIf.blocks...), ctx)
 		if err != nil {
 			panic(err)
 		}
-		buf.WriteString("\n} ")
+		buf.WriteString("} ")
 
 	}
 
 	if len(b.elseBlocks) > 0 {
 		buf.WriteString(" else {\n")
-		err = Fprint(buf, Codes(b.elseBlocks...).Separator("\n"), ctx)
+		err = Fprint(buf, Codes(b.elseBlocks...), ctx)
 		if err != nil {
 			panic(err)
 		}
 
-		buf.WriteString("\n}\n")
+		buf.WriteString("}\n")
 	}
 
 	r = buf.Bytes()

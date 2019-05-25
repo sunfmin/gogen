@@ -34,11 +34,11 @@ func (b *ImportBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 
 	buf := bytes.NewBuffer(nil)
 	buf.WriteString("import (\n")
-	err = Fprint(buf, Codes(b.blocks...).Separator("\n"), ctx)
+	err = Fprint(buf, Codes(b.blocks...), ctx)
 	if err != nil {
 		panic(err)
 	}
-	buf.WriteString("\n)\n")
+	buf.WriteString(")\n")
 	r = buf.Bytes()
 	return
 
