@@ -28,15 +28,17 @@ func (b *StructBuilder) Block(template string, vars ...string) (r *StructBuilder
 }
 
 func (b *StructBuilder) AppendField(name, typ string, tags ...string) (r *StructBuilder) {
-	b.Fields(Codes(
-		RawCode(fmt.Sprintf("%s %s",
-			name,
-			typ,
-		)),
-		If(len(tags) > 0,
-			RawCode("`"+strings.Join(tags, " ")+"`"),
-		),
-	).Separator(" ", false))
+	theTags := ""
+	if len(tags) > 0 {
+		theTags = " `" + strings.Join(tags, " ") + "`"
+	}
+
+	b.Fields(RawCode(fmt.Sprintf("%s %s%s",
+		name,
+		typ,
+		theTags,
+	)))
+
 	return b
 }
 
