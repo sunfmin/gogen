@@ -70,7 +70,7 @@ func (b *StructBuilder) Pointer(v bool) (r *StructBuilder) {
 func (b *StructBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 
 	buf := bytes.NewBuffer(nil)
-	buf.WriteString(fmt.Sprintf("\ntype %s struct {\n", b.name))
+	buf.WriteString(fmt.Sprintf("type %s struct {\n", b.name))
 	err = Fprint(buf, Codes(b.fields...), ctx)
 	if err != nil {
 		return
