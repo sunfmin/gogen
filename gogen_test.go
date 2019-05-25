@@ -183,6 +183,13 @@ func ExampleFile_03Interface() {
 			Block(`var x Writer
 			fmt.Println(x)`),
 		),
+		Func("").Sig(
+			FuncSig("Hello").
+				Parameters("name", "string", "count", "int").
+				Results("r", "bool"),
+		).Block(`
+			return true
+		`),
 	)
 	expected := `package main
 
@@ -199,6 +206,12 @@ type Writer interface {
 func main() {
 	var x Writer
 	fmt.Println(x)
+}
+
+func Hello(name string, count int) (r bool) {
+
+	return true
+
 }
 `
 	diff := testingutils.PrettyJsonDiff(expected, f.MustString(context.Background()))

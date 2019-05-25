@@ -173,6 +173,13 @@ Define a interface type with either one big Block, or add FuncDecl one by one
 	        Block(`var x Writer
 	        fmt.Println(x)`),
 	    ),
+	    Func("").Sig(
+	        FuncSig("Hello").
+	            Parameters("name", "string", "count", "int").
+	            Results("r", "bool"),
+	    ).Block(`
+	        return true
+	    `),
 	)
 	expected := `package main
 	
@@ -189,6 +196,12 @@ Define a interface type with either one big Block, or add FuncDecl one by one
 	func main() {
 	var x Writer
 	fmt.Println(x)
+	}
+	
+	func Hello(name string, count int) (r bool) {
+	
+	return true
+	
 	}
 	`
 	diff := testingutils.PrettyJsonDiff(expected, f.MustString(context.Background()))
