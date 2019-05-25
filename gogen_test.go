@@ -31,10 +31,15 @@ func ExampleFile_01Simple() {
 				const name = "1231"`),
 		Struct("Hello").Block(`
 				Name $pkg.Marshaler
-				Person *Person`, "$pkg", js).AppendField("Age", "int",
-			Tag("gorm", "type:varchar(100);unique_index"),
-			Tag("json", "-"),
-		).Funcs(
+				Person *Person`, "$pkg", js).
+			Fields(
+				Field(
+					"Age",
+					"int",
+					Tag("gorm", "type:varchar(100);unique_index"),
+					Tag("json", "-"),
+				),
+			).Funcs(
 			Func("NameLength(name string) (r int, err error)").Block(`
 						return this`),
 		).ReceiverVar("this").Pointer(false),
@@ -179,7 +184,9 @@ func ExampleFile_03Interface() {
 		Imports("fmt"),
 		Interface("Writer").Block(`
 			Name() string
-		`).AppendFuncDecl(`Write() error`),
+		`).FuncDecls(
+			Block(`Write() error`),
+		),
 		Func("main()").Blocks(
 			Block(`var x Writer
 			fmt.Println(x)`),
@@ -323,11 +330,12 @@ Nil Code ignored
 func ExampleFile_06Nil() {
 
 	f := File("hello.go").Package("main").Blocks(
-		Struct("Hello").
-			AppendFieldComment("hello").
-			AppendField("Name", "string").
-			AppendFieldComment("").
-			AppendField("Age", "int"),
+		Struct("Hello").Fields(
+			LineComment("hello"),
+			Field("Name", "string"),
+			LineComment(""),
+			Field("Age", "int"),
+		),
 	)
 	expected := `package main
 
@@ -351,14 +359,16 @@ Consts example
 func ExampleFile_07Consts() {
 
 	f := File("hello.go").Package("main").Blocks(
-		ConstBlock().Type("Status", "string").Block(
-			`StatusError Status = "Error"`,
-		).AppendConst("OK", "OK"),
+		ConstBlock().Type("Status", "string").Consts(
+			Block(`StatusError Status = "Error"`),
+			Const("OK", "OK"),
+		),
 
-		ConstBlock().Type("HTTPStatus", "int").Block(
-			`HTTPStatusOK HTTPStatus = 200`,
-		).AppendConst("Created", 201).
-			AppendConst("NotFound", 404),
+		ConstBlock().Type("HTTPStatus", "int").Consts(
+			Block(`HTTPStatusOK HTTPStatus = 200`),
+			Const("Created", 201),
+			Const("NotFound", 404),
+		),
 	)
 	expected := `package main
 

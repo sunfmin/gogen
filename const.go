@@ -36,27 +36,18 @@ func (b *ConstBlockBuilder) Block(template string, vars ...string) (r *ConstBloc
 	return b
 }
 
-func (b *ConstBlockBuilder) AppendConst(name string, val interface{}) (r *ConstBlockBuilder) {
-	if len(b.constType) == 0 {
-		panic("To use AppendConst, call Type first")
-	}
-
-	if b.namePrefixType {
-		name = fmt.Sprintf("%s%s", b.constType, name)
-	}
-
-	b.Consts(
-		RawCode(fmt.Sprintf("%s %s = %#+v", name, b.constType, val)),
-	)
-	return b
-}
-
 func (b *ConstBlockBuilder) Consts(cs ...Code) (r *ConstBlockBuilder) {
 	b.consts = append(b.consts, cs...)
 	return b
 }
 
 func (b *ConstBlockBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
+
+	for _, c := range b.consts {
+		if ci, ok := c.(*ConstItemBuilder); ok {
+			ci.SetConstType(b.constType, b.namePrefixType)
+		}
+	}
 
 	buf := bytes.NewBuffer(nil)
 
@@ -72,4 +63,37 @@ func (b *ConstBlockBuilder) MarshalCode(ctx context.Context) (r []byte, err erro
 
 	r = buf.Bytes()
 	return
+}
+
+type ConstItemBuilder struct {
+	name           string
+	val            interface{}
+	constType      string
+	namePrefixType bool
+}
+
+func Const(name string, val interface{}) (r *ConstItemBuilder) {
+	r = &ConstItemBuilder{
+		name: name,
+		val:  val,
+	}
+	return
+}
+
+func (b *ConstItemBuilder) SetConstType(constType string, namePrefixType bool) {
+	b.constType = constType
+	b.namePrefixType = namePrefixType
+}
+
+func (b *ConstItemBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
+
+	if len(b.constType) == 0 {
+		panic("To use Const, Parent must set Type")
+	}
+	var name = b.name
+	if b.namePrefixType {
+		name = fmt.Sprintf("%s%s", b.constType, name)
+	}
+
+	return RawCode(fmt.Sprintf("%s %s = %#+v", name, b.constType, b.val)).MarshalCode(ctx)
 }

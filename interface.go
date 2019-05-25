@@ -22,11 +22,6 @@ func (b *InterfaceBuilder) Block(template string, vars ...string) (r *InterfaceB
 	return b
 }
 
-func (b *InterfaceBuilder) AppendFuncDecl(template string, vars ...string) (r *InterfaceBuilder) {
-	b.FuncDecls(Block(template, vars...))
-	return b
-}
-
 func (b *InterfaceBuilder) FuncDecls(decls ...Code) (r *InterfaceBuilder) {
 	b.funcDecls = append(b.funcDecls, decls...)
 	return b

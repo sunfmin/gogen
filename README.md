@@ -28,10 +28,15 @@ Block can take a template and will replace it with passed in variables.
 	            const name = "1231"`),
 	    Struct("Hello").Block(`
 	            Name $pkg.Marshaler
-	            Person *Person`, "$pkg", js).AppendField("Age", "int",
-	        Tag("gorm", "type:varchar(100);unique_index"),
-	        Tag("json", "-"),
-	    ).Funcs(
+	            Person *Person`, "$pkg", js).
+	        Fields(
+	            Field(
+	                "Age",
+	                "int",
+	                Tag("gorm", "type:varchar(100);unique_index"),
+	                Tag("json", "-"),
+	            ),
+	        ).Funcs(
 	        Func("NameLength(name string) (r int, err error)").Block(`
 	                    return this`),
 	    ).ReceiverVar("this").Pointer(false),
@@ -169,7 +174,9 @@ Define a interface type with either one big Block, or add FuncDecl one by one
 	    Imports("fmt"),
 	    Interface("Writer").Block(`
 	        Name() string
-	    `).AppendFuncDecl(`Write() error`),
+	    `).FuncDecls(
+	        Block(`Write() error`),
+	    ),
 	    Func("main()").Blocks(
 	        Block(`var x Writer
 	        fmt.Println(x)`),
@@ -301,11 +308,12 @@ Generate For blocks
 Nil Code ignored
 ```go
 	f := File("hello.go").Package("main").Blocks(
-	    Struct("Hello").
-	        AppendFieldComment("hello").
-	        AppendField("Name", "string").
-	        AppendFieldComment("").
-	        AppendField("Age", "int"),
+	    Struct("Hello").Fields(
+	        LineComment("hello"),
+	        Field("Name", "string"),
+	        LineComment(""),
+	        Field("Age", "int"),
+	    ),
 	)
 	expected := `package main
 	
@@ -325,14 +333,16 @@ Nil Code ignored
 Consts example
 ```go
 	f := File("hello.go").Package("main").Blocks(
-	    ConstBlock().Type("Status", "string").Block(
-	        `StatusError Status = "Error"`,
-	    ).AppendConst("OK", "OK"),
+	    ConstBlock().Type("Status", "string").Consts(
+	        Block(`StatusError Status = "Error"`),
+	        Const("OK", "OK"),
+	    ),
 	
-	    ConstBlock().Type("HTTPStatus", "int").Block(
-	        `HTTPStatusOK HTTPStatus = 200`,
-	    ).AppendConst("Created", 201).
-	        AppendConst("NotFound", 404),
+	    ConstBlock().Type("HTTPStatus", "int").Consts(
+	        Block(`HTTPStatusOK HTTPStatus = 200`),
+	        Const("Created", 201),
+	        Const("NotFound", 404),
+	    ),
 	)
 	expected := `package main
 	

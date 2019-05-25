@@ -27,28 +27,8 @@ func (b *StructBuilder) Block(template string, vars ...string) (r *StructBuilder
 	return b
 }
 
-func (b *StructBuilder) AppendField(name, typ string, tags ...string) (r *StructBuilder) {
-	theTags := ""
-	if len(tags) > 0 {
-		theTags = " `" + strings.Join(tags, " ") + "`"
-	}
-
-	b.Fields(RawCode(fmt.Sprintf("%s %s%s",
-		name,
-		typ,
-		theTags,
-	)))
-
-	return b
-}
-
 func (b *StructBuilder) Fields(imps ...Code) (r *StructBuilder) {
 	b.fields = append(b.fields, imps...)
-	return b
-}
-
-func (b *StructBuilder) AppendFieldComment(comment string) (r *StructBuilder) {
-	b.fields = append(b.fields, LineComment(comment))
 	return b
 }
 
@@ -102,5 +82,19 @@ func (b *StructBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 
 func Tag(key string, val string) (r string) {
 	r = fmt.Sprintf(`%s "%s"`, key, val)
+	return
+}
+
+func Field(name, typ string, tags ...string) (r Code) {
+	theTags := ""
+	if len(tags) > 0 {
+		theTags = " `" + strings.Join(tags, " ") + "`"
+	}
+
+	r = RawCode(fmt.Sprintf("%s %s%s",
+		name,
+		typ,
+		theTags,
+	))
 	return
 }
