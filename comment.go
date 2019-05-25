@@ -5,11 +5,6 @@ import (
 	"strings"
 )
 
-type InterfaceBuilder struct {
-	name      string
-	funcDecls []Code
-}
-
 func LineComment(comment string) (r Code) {
 	lines := strings.Split(comment, "\n")
 	commentLines := []string{}
