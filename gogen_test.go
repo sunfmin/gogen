@@ -57,43 +57,46 @@ func ExamplePackage_01Simple() {
 	expected := `package simple
 
 import (
-. "github.com/theplant/htmlgo"
-"fmt"
-"strings"
-js "encoding/json"
+	. "github.com/theplant/htmlgo"
+	"fmt"
+	"strings"
+	js "encoding/json"
 )
 
-				var global int
-				const name = "1231"
-type Hello struct {
+var global int
 
-				Name js.Marshaler
-				Person *Person
-Age int $Qgorm "type:varchar(100);unique_index" json "-"$Q
+const name = "1231"
+
+type Hello struct {
+	Name	js.Marshaler
+	Person	*Person
+	Age	int	$Qgorm "type:varchar(100);unique_index" json "-"$Q
 }
+
 func (this Hello) NameLength(name string) (r int, err error) {
 
-						return this
+	return this
 }
 
 func HelloGolang(name string, age *int) (r int, err error) {
 
-				if len(a) > 0 {
-					fmt.Println("yes")
-				} else if len(a) > 10 {
-					fmt.Println("yes!")
-				}
+	if len(a) > 0 {
+		fmt.Println("yes")
+	} else if len(a) > 10 {
+		fmt.Println("yes!")
+	}
 }
 
 func nice() {
 
-				ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
-					Object: "MyObject",
-				})
+	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
+		Object: "MyObject",
+	})
 }
 
-const age = 2`
-	diff := testingutils.PrettyJsonDiff(strings.ReplaceAll(expected, "$Q", "`"), MustString(f, context.Background()))
+const age = 2
+`
+	diff := testingutils.PrettyJsonDiff(strings.ReplaceAll(expected, "$Q", "`"), f.MustString(context.Background()))
 	fmt.Println(diff)
 	//Output:
 	//
@@ -126,30 +129,67 @@ func ExamplePackage_02Switch() {
 	expected := `package main
 
 import (
-"fmt"
+	"fmt"
 )
+
 func main() {
-var x = "hello"
-switch x {
+	var x = "hello"
+	switch x {
 
-			case "one":
-				fmt.Println("one")
+	case "one":
+		fmt.Println("one")
 
-			case "tw\"o":
-				fmt.Println("tw\"o")
+	case "tw\"o":
+		fmt.Println("tw\"o")
 
-			case "three":
-				fmt.Println("three")
+	case "three":
+		fmt.Println("three")
 
 	default:
 		fmt.Println(x, "default")
 
-}
+	}
 
 }
-
 `
-	diff := testingutils.PrettyJsonDiff(expected, MustString(f, context.Background()))
+	diff := testingutils.PrettyJsonDiff(expected, f.MustString(context.Background()))
+
+	fmt.Println(diff)
+	//Output:
+	//
+
+}
+
+func ExamplePackage_03Interface() {
+
+	f := File("").Package("main").Blocks(
+		Imports("fmt"),
+		Interface("Writer").Block(`
+			Name() string
+		`).AppendFuncDecl(`Write() error`),
+		Func("main()").Blocks(
+			Block(`var x Writer
+			fmt.Println(x)`),
+		),
+	)
+	expected := `package main
+
+import (
+	"fmt"
+)
+
+type Writer interface {
+	Name() string
+
+	Write() error
+}
+
+func main() {
+	var x Writer
+	fmt.Println(x)
+}
+`
+	diff := testingutils.PrettyJsonDiff(expected, f.MustString(context.Background()))
 
 	fmt.Println(diff)
 	//Output:
