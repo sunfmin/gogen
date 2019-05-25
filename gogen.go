@@ -49,6 +49,15 @@ func (b *CodesBuilder) Separator(sep string, appendLast bool) (r *CodesBuilder) 
 	return b
 }
 
+func (b *CodesBuilder) Clone() (r *CodesBuilder) {
+	r = &CodesBuilder{
+		cs:         b.cs,
+		sep:        b.sep,
+		appendLast: b.appendLast,
+	}
+	return
+}
+
 func (b *CodesBuilder) Append(codes ...Code) (r *CodesBuilder) {
 	b.cs = append(b.cs, codes...)
 	return b
