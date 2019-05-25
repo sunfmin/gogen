@@ -322,5 +322,41 @@ Nil Code ignored
 	//
 ```
 
+Consts example
+```go
+	f := File("hello.go").Package("main").Blocks(
+	    ConstBlock().Type("Status", "string").Block(
+	        `StatusError Status = "Error"`,
+	    ).AppendConst("OK", "OK"),
+	
+	    ConstBlock().Type("HTTPStatus", "int").Block(
+	        `HTTPStatusOK HTTPStatus = 200`,
+	    ).AppendConst("Created", 201).
+	        AppendConst("NotFound", 404),
+	)
+	expected := `package main
+	
+	type Status string
+	
+	const (
+	StatusError	Status	= "Error"
+	StatusOK	Status	= "OK"
+	)
+	
+	type HTTPStatus int
+	
+	const (
+	HTTPStatusOK		HTTPStatus	= 200
+	HTTPStatusCreated	HTTPStatus	= 201
+	HTTPStatusNotFound	HTTPStatus	= 404
+	)
+	`
+	diff := testingutils.PrettyJsonDiff(expected, f.MustString(context.Background()))
+	
+	fmt.Println(diff)
+	//Output:
+	//
+```
+
 
 
