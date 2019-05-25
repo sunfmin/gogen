@@ -40,8 +40,12 @@ func (b *FuncBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 
 	buf := bytes.NewBuffer(nil)
 
-	if strings.Index(b.sig, "func") != 0 && len(b.receiver) > 0 {
-		b.sig = fmt.Sprintf("%s %s", b.receiver, b.sig)
+	if strings.Index(b.sig, "func") != 0 {
+		if len(b.receiver) > 0 {
+			b.sig = fmt.Sprintf("%s %s", b.receiver, b.sig)
+		} else {
+			b.sig = fmt.Sprintf("func %s", b.sig)
+		}
 	}
 
 	err = Fprint(buf, Block(b.sig, b.vars...), ctx)
