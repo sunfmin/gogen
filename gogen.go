@@ -13,8 +13,6 @@ import (
 	"io"
 )
 
-var empty = RawCode("")
-
 type Code interface {
 	MarshalCode(ctx context.Context) (r []byte, err error)
 }
@@ -56,6 +54,9 @@ func (b *CodesBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 	buf := bytes.NewBuffer(nil)
 	l := len(b.cs)
 	for i, c := range b.cs {
+		if c == nil {
+			continue
+		}
 		err = Fprint(buf, c, ctx)
 		if err != nil {
 			return

@@ -33,13 +33,20 @@ func (b *StructBuilder) AppendField(name, typ string, tags ...string) (r *Struct
 			name,
 			typ,
 		)),
-		RawCode("`"+strings.Join(tags, " ")+"`"),
+		If(len(tags) > 0,
+			RawCode("`"+strings.Join(tags, " ")+"`"),
+		),
 	).Separator(" "))
 	return b
 }
 
 func (b *StructBuilder) Fields(imps ...Code) (r *StructBuilder) {
 	b.fields = append(b.fields, imps...)
+	return b
+}
+
+func (b *StructBuilder) AppendFieldComment(comment string) (r *StructBuilder) {
+	b.fields = append(b.fields, LineComment(comment))
 	return b
 }
 

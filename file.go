@@ -51,7 +51,7 @@ func (b *FileBuilder) Fprint(w io.Writer, ctx context.Context) (err error) {
 	src := MustString(b, ctx)
 	fset := token.NewFileSet()
 	var f *ast.File
-	f, err = parser.ParseFile(fset, b.name, src, 0)
+	f, err = parser.ParseFile(fset, b.name, src, parser.ParseComments)
 	if err != nil {
 		return
 	}

@@ -298,5 +298,29 @@ Generate For blocks
 	//
 ```
 
+Nil Code ignored
+```go
+	f := File("hello.go").Package("main").Blocks(
+	    Struct("Hello").
+	        AppendFieldComment("hello").
+	        AppendField("Name", "string").
+	        AppendFieldComment("").
+	        AppendField("Age", "int"),
+	)
+	expected := `package main
+	
+	type Hello struct {
+	// hello
+	Name	string
+	Age	int
+	}
+	`
+	diff := testingutils.PrettyJsonDiff(expected, f.MustString(context.Background()))
+	
+	fmt.Println(diff)
+	//Output:
+	//
+```
+
 
 
