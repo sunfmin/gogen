@@ -248,5 +248,42 @@ Generate If else blocks
 	//
 ```
 
+Generate For blocks
+```go
+	f := File("hello.go").Package("main").Blocks(
+	    Imports("fmt"),
+	    Func("main()").Blocks(
+	        ForBlock("").Blocks(
+	            Block(`fmt.Println("hello")`),
+	        ),
+	        Block(`var strs = []string{"1", "2", "3"}`),
+	        ForBlock("_, x := range strs").Blocks(
+	            Block(`fmt.Println("hello", x)`),
+	        ),
+	    ),
+	)
+	expected := `package main
+	
+	import (
+	"fmt"
+	)
+	
+	func main() {
+	for {
+	    fmt.Println("hello")
+	}
+	var strs = []string{"1", "2", "3"}
+	for _, x := range strs {
+	    fmt.Println("hello", x)
+	}
+	}
+	`
+	diff := testingutils.PrettyJsonDiff(expected, f.MustString(context.Background()))
+	
+	fmt.Println(diff)
+	//Output:
+	//
+```
+
 
 
