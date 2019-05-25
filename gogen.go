@@ -13,6 +13,8 @@ import (
 	"io"
 )
 
+var empty = RawCode("")
+
 type Code interface {
 	MarshalCode(ctx context.Context) (r []byte, err error)
 }

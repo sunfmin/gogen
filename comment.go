@@ -6,6 +6,10 @@ import (
 )
 
 func LineComment(comment string) (r Code) {
+	if len(comment) == 0 {
+		return empty
+	}
+
 	lines := strings.Split(comment, "\n")
 	commentLines := []string{}
 	for _, l := range lines {
@@ -15,5 +19,9 @@ func LineComment(comment string) (r Code) {
 }
 
 func BlockComment(comment string) (r Code) {
+	if len(comment) == 0 {
+		return empty
+	}
+
 	return RawCode(fmt.Sprintf("/*\n%s\n*/\n", comment))
 }
