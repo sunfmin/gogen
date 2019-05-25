@@ -6,16 +6,16 @@ import (
 )
 
 type BlockBuilder struct {
-	template  string
-	vars      []string
-	varBlocks map[string]Code
+	template string
+	vars     []string
+	varCodes map[string]Code
 }
 
 func Block(template string, vars ...string) (r *BlockBuilder) {
 	r = &BlockBuilder{
-		template:  template,
-		vars:      vars,
-		varBlocks: make(map[string]Code),
+		template: template,
+		vars:     vars,
+		varCodes: make(map[string]Code),
 	}
 	return
 }
@@ -25,8 +25,8 @@ func (b *BlockBuilder) Var(varName string, val string) (r *BlockBuilder) {
 	return b
 }
 
-func (b *BlockBuilder) VarBlock(varName string, c Code) (r *BlockBuilder) {
-	b.varBlocks[varName] = c
+func (b *BlockBuilder) VarCode(varName string, c Code) (r *BlockBuilder) {
+	b.varCodes[varName] = c
 	return b
 }
 
@@ -41,7 +41,7 @@ func (b *BlockBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 		val = strings.ReplaceAll(val, vars[i], vars[i+1])
 	}
 
-	for varName, c := range b.varBlocks {
+	for varName, c := range b.varCodes {
 		val = strings.ReplaceAll(val, varName, MustString(c, ctx))
 	}
 

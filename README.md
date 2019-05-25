@@ -382,8 +382,8 @@ More about blocks
 	    var All$Type = []$Type {
 	        $Vals
 	    }
-	    `, "$Type", "Episode").
-	        VarBlock("$Vals", valsBlock),
+	    `).Var("$Type", "Episode").
+	        VarCode("$Vals", valsBlock),
 	)
 	expected := `package main
 	
