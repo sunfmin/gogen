@@ -10,7 +10,13 @@ import (
 	. "github.com/sunfmin/gogen"
 )
 
-func ExamplePackage_01Simple() {
+/*
+File means a go source file, set it's package name, and continue it's source code blocks,
+like Imports, Structs, Funcs
+
+Block can take a template and will replace it with passed in variables.
+*/
+func ExampleFile_01Simple() {
 	var js = "js"
 	f := File("api.go").Package("simple").Blocks(
 		Imports(
@@ -102,7 +108,10 @@ const age = 2
 	//
 }
 
-func ExamplePackage_02Switch() {
+/*
+Write a loop to add SwitchBlock Cases to write more cases
+*/
+func ExampleFile_02Switch() {
 
 	var strs = []string{"one", "tw\"o", "three"}
 
@@ -160,9 +169,12 @@ func main() {
 
 }
 
-func ExamplePackage_03Interface() {
+/*
+Define a interface type with either one big Block, or add FuncDecl one by one
+*/
+func ExampleFile_03Interface() {
 
-	f := File("").Package("main").Blocks(
+	f := File("hello.go").Package("main").Blocks(
 		Imports("fmt"),
 		Interface("Writer").Block(`
 			Name() string
@@ -187,6 +199,60 @@ type Writer interface {
 func main() {
 	var x Writer
 	fmt.Println(x)
+}
+`
+	diff := testingutils.PrettyJsonDiff(expected, f.MustString(context.Background()))
+
+	fmt.Println(diff)
+	//Output:
+	//
+
+}
+
+/*
+Generate If else blocks
+*/
+func ExampleFile_04IfBlock() {
+
+	f := File("hello.go").Package("main").Blocks(
+		Imports("fmt"),
+		Func("main()").Blocks(
+			Block(`var x = 100
+			fmt.Println(x)`),
+			IfBlock("$var > 0", "$var", "x").Then(
+				Block(`fmt.Println("x > 0")`),
+			).ElseIf("x > 10 && x < 20").Then(
+				Block(`fmt.Println("x > 10 and x < 20")`),
+			).ElseIf("x > 20").Then(
+				IfBlock("x == 5"),
+				Block(`fmt.Println("x > 20")`),
+			).Else(
+				Block(`fmt.Println("else")`),
+			),
+		),
+	)
+	expected := `package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	var x = 100
+	fmt.Println(x)
+	if x > 0 {
+		fmt.Println("x > 0")
+	} else if x > 10 && x < 20 {
+		fmt.Println("x > 10 and x < 20")
+	} else if x > 20 {
+		if x == 5 {
+
+		}
+		fmt.Println("x > 20")
+	} else {
+		fmt.Println("else")
+	}
+
 }
 `
 	diff := testingutils.PrettyJsonDiff(expected, f.MustString(context.Background()))

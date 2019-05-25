@@ -1,3 +1,9 @@
+/*
+# gogen: Generate Go code with structured blocks and composition
+
+	import . "github.com/sunfmin/gogen"
+
+*/
 package gogen
 
 import (
