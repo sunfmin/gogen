@@ -45,6 +45,11 @@ func (b *CodesBuilder) Separator(sep string) (r *CodesBuilder) {
 	return b
 }
 
+func (b *CodesBuilder) Append(codes ...Code) (r *CodesBuilder) {
+	b.cs = append(b.cs, codes...)
+	return b
+}
+
 func (b *CodesBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 	buf := bytes.NewBuffer(nil)
 	l := len(b.cs)
