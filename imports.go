@@ -17,13 +17,18 @@ func Imports(imps ...string) (r *ImportBuilder) {
 		if imr[len(imr)-1] != '"' {
 			im = fmt.Sprintf("%q", im)
 		}
-		r.blocks = append(r.blocks, RawCode(im))
+		r.blocks = append(r.blocks, Raw(im))
 	}
 	return
 }
 
-func (b *ImportBuilder) Blocks(imps ...Code) (r *ImportBuilder) {
+func (b *ImportBuilder) Body(imps ...Code) (r *ImportBuilder) {
 	b.blocks = append(b.blocks, imps...)
+	return b
+}
+
+func (b *ImportBuilder) BodySnippet(template string, vars ...string) (r *ImportBuilder) {
+	b.Body(Snippet(template, vars...))
 	return b
 }
 
@@ -34,7 +39,7 @@ func (b *ImportBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 
 	buf := bytes.NewBuffer(nil)
 	buf.WriteString("import (\n")
-	err = Fprint(buf, Codes(b.blocks...), ctx)
+	err = Fprint(buf, Snippets(b.blocks...), ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -46,7 +51,7 @@ func (b *ImportBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 
 func ImportAs(as string, imp string) (r Code) {
 	if len(as) == 0 {
-		return RawCode(fmt.Sprintf(`"%s"`, imp))
+		return Raw(fmt.Sprintf(`"%s"`, imp))
 	}
-	return RawCode(fmt.Sprintf(`%s "%s"`, as, imp))
+	return Raw(fmt.Sprintf(`%s "%s"`, as, imp))
 }

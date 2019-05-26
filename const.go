@@ -31,8 +31,8 @@ func (b *ConstBlockBuilder) NamePrefixType(v bool) (r *ConstBlockBuilder) {
 	return b
 }
 
-func (b *ConstBlockBuilder) Block(template string, vars ...string) (r *ConstBlockBuilder) {
-	b.Consts(Block(template, vars...))
+func (b *ConstBlockBuilder) ConstSnippet(template string, vars ...string) (r *ConstBlockBuilder) {
+	b.Consts(Snippet(template, vars...))
 	return b
 }
 
@@ -55,7 +55,7 @@ func (b *ConstBlockBuilder) MarshalCode(ctx context.Context) (r []byte, err erro
 		buf.WriteString(fmt.Sprintf("type %s %s\n", b.constType, b.toType))
 	}
 	buf.WriteString("const (\n")
-	err = Fprint(buf, Codes(b.consts...), ctx)
+	err = Fprint(buf, Snippets(b.consts...), ctx)
 	if err != nil {
 		return
 	}
@@ -95,5 +95,5 @@ func (b *ConstItemBuilder) MarshalCode(ctx context.Context) (r []byte, err error
 		name = fmt.Sprintf("%s%s", b.constType, name)
 	}
 
-	return RawCode(fmt.Sprintf("%s %s = %#+v", name, b.constType, b.val)).MarshalCode(ctx)
+	return Raw(fmt.Sprintf("%s %s = %#+v", name, b.constType, b.val)).MarshalCode(ctx)
 }

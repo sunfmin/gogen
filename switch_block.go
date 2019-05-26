@@ -13,7 +13,7 @@ type SwitchBlockBuilder struct {
 
 func SwitchBlock(switchTemplate string, vars ...string) (r *SwitchBlockBuilder) {
 	r = &SwitchBlockBuilder{}
-	r.switchBlock = Block(switchTemplate, vars...)
+	r.switchBlock = Snippet(switchTemplate, vars...)
 	return
 }
 
@@ -22,8 +22,13 @@ func (b *SwitchBlockBuilder) Cases(caseBlocks ...Code) (r *SwitchBlockBuilder) {
 	return b
 }
 
+func (b *SwitchBlockBuilder) CasesSnippet(template string, vars ...string) (r *SwitchBlockBuilder) {
+	b.Cases(Snippet(template, vars...))
+	return b
+}
+
 func (b *SwitchBlockBuilder) Default(defaultTemplate string, vars ...string) (r *SwitchBlockBuilder) {
-	b.defaultBlock = Block(defaultTemplate, vars...)
+	b.defaultBlock = Snippet(defaultTemplate, vars...)
 	return b
 }
 
@@ -35,7 +40,7 @@ func (b *SwitchBlockBuilder) MarshalCode(ctx context.Context) (r []byte, err err
 		return
 	}
 	buf.WriteString(" {\n")
-	err = Fprint(buf, Codes(b.cases...), ctx)
+	err = Fprint(buf, Snippets(b.cases...), ctx)
 	if err != nil {
 		panic(err)
 	}

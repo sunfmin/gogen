@@ -24,7 +24,7 @@ func IfBlock(ifTemplate string, vars ...string) (r *IfBlockBuilder) {
 		ifTemplate = fmt.Sprintf("%s %s", "if", ifTemplate)
 	}
 
-	r.ifBlock = &condBlocks{cond: Block(ifTemplate, vars...)}
+	r.ifBlock = &condBlocks{cond: Snippet(ifTemplate, vars...)}
 	r.lastCondBlocks = r.ifBlock
 	return
 }
@@ -34,18 +34,28 @@ func (b *IfBlockBuilder) Then(blocks ...Code) (r *IfBlockBuilder) {
 	return b
 }
 
+func (b *IfBlockBuilder) ThenSnippet(template string, vars ...string) (r *IfBlockBuilder) {
+	b.Then(Snippet(template, vars...))
+	return b
+}
+
 func (b *IfBlockBuilder) ElseIf(elseIfTemplate string, vars ...string) (r *IfBlockBuilder) {
 	if strings.Index(elseIfTemplate, "else if") != 0 {
 		elseIfTemplate = fmt.Sprintf("%s %s", "else if", elseIfTemplate)
 	}
 
-	b.lastCondBlocks = &condBlocks{cond: Block(elseIfTemplate, vars...)}
+	b.lastCondBlocks = &condBlocks{cond: Snippet(elseIfTemplate, vars...)}
 	b.elseIfBlocks = append(b.elseIfBlocks, b.lastCondBlocks)
 	return b
 }
 
 func (b *IfBlockBuilder) Else(blocks ...Code) (r *IfBlockBuilder) {
 	b.elseBlocks = append(b.elseBlocks, blocks...)
+	return b
+}
+
+func (b *IfBlockBuilder) ElseSnippet(template string, vars ...string) (r *IfBlockBuilder) {
+	b.Else(Snippet(template, vars...))
 	return b
 }
 
@@ -57,7 +67,7 @@ func (b *IfBlockBuilder) MarshalCode(ctx context.Context) (r []byte, err error) 
 		return
 	}
 	buf.WriteString(" {\n")
-	err = Fprint(buf, Codes(b.ifBlock.blocks...), ctx)
+	err = Fprint(buf, Snippets(b.ifBlock.blocks...), ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -70,7 +80,7 @@ func (b *IfBlockBuilder) MarshalCode(ctx context.Context) (r []byte, err error) 
 		}
 
 		buf.WriteString(" {\n")
-		err = Fprint(buf, Codes(elsIf.blocks...), ctx)
+		err = Fprint(buf, Snippets(elsIf.blocks...), ctx)
 		if err != nil {
 			panic(err)
 		}
@@ -80,7 +90,7 @@ func (b *IfBlockBuilder) MarshalCode(ctx context.Context) (r []byte, err error) 
 
 	if len(b.elseBlocks) > 0 {
 		buf.WriteString(" else {\n")
-		err = Fprint(buf, Codes(b.elseBlocks...), ctx)
+		err = Fprint(buf, Snippets(b.elseBlocks...), ctx)
 		if err != nil {
 			panic(err)
 		}

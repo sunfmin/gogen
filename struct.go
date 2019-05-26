@@ -22,8 +22,8 @@ func Struct(name string) (r *StructBuilder) {
 	return
 }
 
-func (b *StructBuilder) Block(template string, vars ...string) (r *StructBuilder) {
-	b.Fields(Block(template, vars...))
+func (b *StructBuilder) FieldsSnippet(template string, vars ...string) (r *StructBuilder) {
+	b.Fields(Snippet(template, vars...))
 	return b
 }
 
@@ -34,6 +34,11 @@ func (b *StructBuilder) Fields(imps ...Code) (r *StructBuilder) {
 
 func (b *StructBuilder) Funcs(funcs ...Code) (r *StructBuilder) {
 	b.funcs = append(b.funcs, funcs...)
+	return b
+}
+
+func (b *StructBuilder) FuncsSnippet(template string, vars ...string) (r *StructBuilder) {
+	b.Funcs(Snippet(template, vars...))
 	return b
 }
 
@@ -51,7 +56,7 @@ func (b *StructBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 
 	buf := bytes.NewBuffer(nil)
 	buf.WriteString(fmt.Sprintf("type %s struct {\n", b.name))
-	err = Fprint(buf, Codes(b.fields...), ctx)
+	err = Fprint(buf, Snippets(b.fields...), ctx)
 	if err != nil {
 		return
 	}
@@ -71,7 +76,7 @@ func (b *StructBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 		}
 	}
 
-	err = Fprint(buf, Codes(b.funcs...), ctx)
+	err = Fprint(buf, Snippets(b.funcs...), ctx)
 	if err != nil {
 		return
 	}
@@ -91,7 +96,7 @@ func Field(name, typ string, tags ...string) (r Code) {
 		theTags = " `" + strings.Join(tags, " ") + "`"
 	}
 
-	r = RawCode(fmt.Sprintf("%s %s%s",
+	r = Raw(fmt.Sprintf("%s %s%s",
 		name,
 		typ,
 		theTags,

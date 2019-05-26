@@ -22,8 +22,8 @@ func Func(sig string, vars ...string) (r *FuncBuilder) {
 	return
 }
 
-func (b *FuncBuilder) Block(template string, vars ...string) (r *FuncBuilder) {
-	b.Blocks(Block(template, vars...))
+func (b *FuncBuilder) BodySnippet(template string, vars ...string) (r *FuncBuilder) {
+	b.Body(Snippet(template, vars...))
 	return b
 }
 
@@ -37,7 +37,7 @@ func (b *FuncBuilder) Sig(sig *FuncSigBuilder) (r *FuncBuilder) {
 	return b
 }
 
-func (b *FuncBuilder) Blocks(blocks ...Code) (r *FuncBuilder) {
+func (b *FuncBuilder) Body(blocks ...Code) (r *FuncBuilder) {
 	b.blocks = append(b.blocks, blocks...)
 	return b
 }
@@ -60,7 +60,7 @@ func (b *FuncBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 			}
 		}
 
-		err = Fprint(buf, Block(b.sig, b.vars...), ctx)
+		err = Fprint(buf, Snippet(b.sig, b.vars...), ctx)
 		if err != nil {
 			return
 		}
@@ -68,7 +68,7 @@ func (b *FuncBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 
 	buf.WriteString(" {\n")
 
-	err = Fprint(buf, Codes(b.blocks...), ctx)
+	err = Fprint(buf, Snippets(b.blocks...), ctx)
 	if err != nil {
 		return
 	}

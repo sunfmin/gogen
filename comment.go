@@ -14,7 +14,7 @@ func LineComment(comment string) (r Code) {
 	for _, l := range lines {
 		commentLines = append(commentLines, fmt.Sprintf("// %s", l))
 	}
-	return RawCode(strings.Join(commentLines, "\n"))
+	return Raw(strings.Join(commentLines, "\n"))
 }
 
 func BlockComment(comment string) (r Code) {
@@ -22,5 +22,5 @@ func BlockComment(comment string) (r Code) {
 		return
 	}
 
-	return RawCode(fmt.Sprintf("/*\n%s\n*/\n", comment))
+	return Raw(fmt.Sprintf("/*\n%s\n*/\n", comment))
 }

@@ -40,5 +40,5 @@ func (b *IfBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 	if len(b.cs) == 0 {
 		return
 	}
-	return Codes(b.cs...).MarshalCode(ctx)
+	return Snippets(b.cs...).MarshalCode(ctx)
 }

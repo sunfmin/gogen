@@ -19,9 +19,9 @@ type Code interface {
 
 type CodeFunc func(ctx context.Context) (r []byte, err error)
 
-type RawCode string
+type Raw string
 
-func (rc RawCode) MarshalCode(ctx context.Context) (r []byte, err error) {
+func (rc Raw) MarshalCode(ctx context.Context) (r []byte, err error) {
 	r = []byte(rc)
 	return
 }
@@ -30,27 +30,27 @@ func (cf CodeFunc) MarshalCode(ctx context.Context) (r []byte, err error) {
 	return cf(ctx)
 }
 
-type CodesBuilder struct {
+type SnippetsBuilder struct {
 	cs         []Code
 	sep        string
 	appendLast bool
 }
 
-func Codes(cs ...Code) (r *CodesBuilder) {
-	r = &CodesBuilder{cs: cs}
+func Snippets(cs ...Code) (r *SnippetsBuilder) {
+	r = &SnippetsBuilder{cs: cs}
 	r.sep = "\n"
 	r.appendLast = true
 	return
 }
 
-func (b *CodesBuilder) Separator(sep string, appendLast bool) (r *CodesBuilder) {
+func (b *SnippetsBuilder) Separator(sep string, appendLast bool) (r *SnippetsBuilder) {
 	b.sep = sep
 	b.appendLast = appendLast
 	return b
 }
 
-func (b *CodesBuilder) Clone() (r *CodesBuilder) {
-	r = &CodesBuilder{
+func (b *SnippetsBuilder) Clone() (r *SnippetsBuilder) {
+	r = &SnippetsBuilder{
 		cs:         b.cs,
 		sep:        b.sep,
 		appendLast: b.appendLast,
@@ -58,12 +58,17 @@ func (b *CodesBuilder) Clone() (r *CodesBuilder) {
 	return
 }
 
-func (b *CodesBuilder) Append(codes ...Code) (r *CodesBuilder) {
-	b.cs = append(b.cs, codes...)
+func (b *SnippetsBuilder) Append(Snippets ...Code) (r *SnippetsBuilder) {
+	b.cs = append(b.cs, Snippets...)
 	return b
 }
 
-func (b *CodesBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
+func (b *SnippetsBuilder) AppendSnippet(template string, vars ...string) (r *SnippetsBuilder) {
+	b.Append(Snippet(template, vars...))
+	return b
+}
+
+func (b *SnippetsBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 	buf := bytes.NewBuffer(nil)
 	l := len(b.cs)
 	for i, c := range b.cs {

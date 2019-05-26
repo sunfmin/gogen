@@ -18,12 +18,17 @@ func ForBlock(forTemplate string, vars ...string) (r *ForBlockBuilder) {
 		forTemplate = fmt.Sprintf("%s %s", "for", forTemplate)
 	}
 
-	r.cond = Block(forTemplate, vars...)
+	r.cond = Snippet(forTemplate, vars...)
 	return
 }
 
-func (b *ForBlockBuilder) Blocks(blocks ...Code) (r *ForBlockBuilder) {
+func (b *ForBlockBuilder) Body(blocks ...Code) (r *ForBlockBuilder) {
 	b.blocks = append(b.blocks, blocks...)
+	return b
+}
+
+func (b *ForBlockBuilder) BodySnippet(template string, vars ...string) (r *ForBlockBuilder) {
+	b.Body(Snippet(template, vars...))
 	return b
 }
 
@@ -35,7 +40,7 @@ func (b *ForBlockBuilder) MarshalCode(ctx context.Context) (r []byte, err error)
 		return
 	}
 	buf.WriteString(" {\n")
-	err = Fprint(buf, Codes(b.blocks...), ctx)
+	err = Fprint(buf, Snippets(b.blocks...), ctx)
 	if err != nil {
 		panic(err)
 	}

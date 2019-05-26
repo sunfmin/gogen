@@ -25,8 +25,13 @@ func File(name string) (r *FileBuilder) {
 	return
 }
 
-func (b *FileBuilder) Blocks(cs ...Code) (r *FileBuilder) {
+func (b *FileBuilder) Body(cs ...Code) (r *FileBuilder) {
 	b.blocks = append(b.blocks, cs...)
+	return b
+}
+
+func (b *FileBuilder) BodySnippet(template string, vars ...string) (r *FileBuilder) {
+	b.Body(Snippet(template, vars...))
 	return b
 }
 
@@ -39,7 +44,7 @@ func (b *FileBuilder) MarshalCode(ctx context.Context) (r []byte, err error) {
 	buf := bytes.NewBuffer(nil)
 	buf.WriteString("package " + b.pkg)
 	buf.WriteString("\n\n")
-	err = Fprint(buf, Codes(b.blocks...), ctx)
+	err = Fprint(buf, Snippets(b.blocks...), ctx)
 	if err != nil {
 		return
 	}

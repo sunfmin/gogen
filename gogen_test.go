@@ -18,18 +18,21 @@ Block can take a template and will replace it with passed in variables.
 */
 func ExampleFile_01Simple() {
 	var js = "js"
-	f := File("api.go").Package("simple").Blocks(
+	f := File("api.go").Package("simple").Body(
 		Imports(
 			`. "github.com/theplant/htmlgo"`,
 			"fmt",
 			"strings",
-		).Blocks(
+		).Body(
 			ImportAs(js, "encoding/json"),
 		),
-		Block(`
+
+		Snippet(`
 				var global int
 				const name = "1231"`),
-		Struct("Hello").Block(`
+
+		Struct("Hello").
+			FieldsSnippet(`
 				Name $pkg.Marshaler
 				Person *Person`, "$pkg", js).
 			Fields(
@@ -39,31 +42,34 @@ func ExampleFile_01Simple() {
 					Tag("gorm", "type:varchar(100);unique_index"),
 					Tag("json", "-"),
 				),
-			).Funcs(
-			Func("NameLength(name string) (r int, err error)").Block(`
+			).
+			Funcs(
+				Func("NameLength(name string) (r int, err error)").BodySnippet(`
 						return this`),
-		).ReceiverVar("this").Pointer(false),
-		Func("func Hello$Type(name string, age *int) (r int, err error)", "$Type", "Golang").Blocks(
-			Block(`
+			).
+			ReceiverVar("this").
+			Pointer(false),
+
+		Func("func Hello$Type(name string, age *int) (r int, err error)", "$Type", "Golang").BodySnippet(`
 				if len(a) > 0 {
 					fmt.Println("yes")
 				} else if len(a) > 10 {
 					fmt.Println("yes!")
-				}`),
+				}`,
 		),
 
 		If(true,
-			Func("func nice()").Blocks(
+			Func("func nice()").Body(
 				If(true,
-					Block(`
+					Snippet(`
 				ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
 					Object: $objectName,
 				})`, "$objectName", Quote("MyObject")),
 				),
 			),
 		),
-	).Blocks(
-		Block(`const age = 2`),
+	).BodySnippet(
+		`const age = 2`,
 	)
 	expected := `package simple
 
@@ -124,9 +130,9 @@ func ExampleFile_02Switch() {
 	sw := SwitchBlock("switch x")
 
 	for _, s := range strs {
-		sw.Cases(Block(`
+		sw.CasesSnippet(`
 			case $v:
-				fmt.Println($v)`, "$v", Quote(s)))
+				fmt.Println($v)`, "$v", Quote(s))
 	}
 
 	sw.Default(`
@@ -134,10 +140,10 @@ func ExampleFile_02Switch() {
 		fmt.Println(x, "default")
 `)
 
-	f := File("").Package("main").Blocks(
+	f := File("").Package("main").Body(
 		Imports("fmt"),
-		Func("main()").Blocks(
-			Block(`var x = "hello"`),
+		Func("main()").Body(
+			Snippet(`var x = "hello"`),
 			sw,
 		),
 	)
@@ -180,22 +186,22 @@ Define a interface type with either one big Block, or add FuncDecl one by one
 */
 func ExampleFile_03Interface() {
 
-	f := File("hello.go").Package("main").Blocks(
+	f := File("hello.go").Package("main").Body(
 		Imports("fmt"),
-		Interface("Writer").Block(`
+		Interface("Writer").BodySnippet(`
 			Name() string
-		`).FuncDecls(
-			Block(`Write() error`),
+		`).Body(
+			Snippet(`Write() error`),
 		),
-		Func("main()").Blocks(
-			Block(`var x Writer
-			fmt.Println(x)`),
+		Func("main()").BodySnippet(
+			`var x Writer
+			fmt.Println(x)`,
 		),
 		Func("").Sig(
 			FuncSig("Hello").
 				Parameters("name", "string", "count", "int").
 				Results("r", "bool"),
-		).Block(`
+		).BodySnippet(`
 			return true
 		`),
 	)
@@ -235,20 +241,20 @@ Generate If else blocks
 */
 func ExampleFile_04IfBlock() {
 
-	f := File("hello.go").Package("main").Blocks(
+	f := File("hello.go").Package("main").Body(
 		Imports("fmt"),
-		Func("main()").Blocks(
-			Block(`var x = 100
+		Func("main()").Body(
+			Snippet(`var x = 100
 			fmt.Println(x)`),
-			IfBlock("$var > 0", "$var", "x").Then(
-				Block(`fmt.Println("x > 0")`),
-			).ElseIf("x > 10 && x < 20").Then(
-				Block(`fmt.Println("x > 10 and x < 20")`),
+			IfBlock("$var > 0", "$var", "x").ThenSnippet(
+				`fmt.Println("x > 0")`,
+			).ElseIf("x > 10 && x < 20").ThenSnippet(
+				`fmt.Println("x > 10 and x < 20")`,
 			).ElseIf("x > 20").Then(
 				IfBlock("x == 5"),
-				Block(`fmt.Println("x > 20")`),
-			).Else(
-				Block(`fmt.Println("else")`),
+				Snippet(`fmt.Println("x > 20")`),
+			).ElseSnippet(
+				`fmt.Println("else")`,
 			),
 		),
 	)
@@ -288,15 +294,15 @@ Generate For blocks
 */
 func ExampleFile_05ForBlock() {
 
-	f := File("hello.go").Package("main").Blocks(
+	f := File("hello.go").Package("main").Body(
 		Imports("fmt"),
-		Func("main()").Blocks(
-			ForBlock("").Blocks(
-				Block(`fmt.Println("hello")`),
+		Func("main()").Body(
+			ForBlock("").BodySnippet(
+				`fmt.Println("hello")`,
 			),
-			Block(`var strs = []string{"1", "2", "3"}`),
-			ForBlock("_, x := range strs").Blocks(
-				Block(`fmt.Println("hello", x)`),
+			Snippet(`var strs = []string{"1", "2", "3"}`),
+			ForBlock("_, x := range strs").Body(
+				Snippet(`fmt.Println("hello", x)`),
 			),
 		),
 	)
@@ -329,7 +335,7 @@ Nil Code ignored
 */
 func ExampleFile_06Nil() {
 
-	f := File("hello.go").Package("main").Blocks(
+	f := File("hello.go").Package("main").Body(
 		Struct("Hello").Fields(
 			LineComment("hello"),
 			Field("Name", "string"),
@@ -358,14 +364,14 @@ Consts example
 */
 func ExampleFile_07Consts() {
 
-	f := File("hello.go").Package("main").Blocks(
+	f := File("hello.go").Package("main").Body(
 		ConstBlock().Type("Status", "string").Consts(
-			Block(`StatusError Status = "Error"`),
+			Snippet(`StatusError Status = "Error"`),
 			Const("OK", "OK"),
 		),
 
 		ConstBlock().Type("HTTPStatus", "int").Consts(
-			Block(`HTTPStatusOK HTTPStatus = 200`),
+			Snippet(`HTTPStatusOK HTTPStatus = 200`),
 			Const("Created", 201),
 			Const("NotFound", 404),
 		),
@@ -396,19 +402,19 @@ const (
 }
 
 /*
-More about blocks
+More about snippet
 */
-func ExampleFile_08Blocks() {
+func ExampleFile_08MoreSnippet() {
 
 	vals := []string{"Newhope", "Empire", "Jedi"}
 
-	valsBlock := Codes().Separator(",\n", true)
+	valsBlock := Snippets().Separator(",\n", true)
 	for _, v := range vals {
-		valsBlock.Append(Block("$Type$Val", "$Type", "Episode", "$Val", v))
+		valsBlock.AppendSnippet("$Type$Val", "$Type", "Episode", "$Val", v)
 	}
 
-	f := File("hello.go").Package("main").Blocks(
-		Block(`
+	f := File("hello.go").Package("main").Body(
+		Snippet(`
 		var All$Type = []$Type {
 			$Vals
 		}
