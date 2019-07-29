@@ -64,14 +64,18 @@ func (b *FileBuilder) Fprint(w io.Writer, ctx context.Context) (err error) {
 	return
 }
 
-func (b *FileBuilder) MustString(ctx context.Context) (r string) {
-	buf := bytes.NewBuffer(nil)
-	err := b.Fprint(buf, ctx)
+func (b *FileBuilder) MustFprint(w io.Writer, ctx context.Context) {
+	err := b.Fprint(w, ctx)
 	if err != nil {
 		hl, _ := strconv.ParseInt(strings.Split(err.Error(), ":")[0], 10, 64)
-
 		panic(fmt.Sprintf("%s\n%s", err, codeWithLineNumber(b, hl, ctx)))
 	}
+	return
+}
+
+func (b *FileBuilder) MustString(ctx context.Context) (r string) {
+	buf := bytes.NewBuffer(nil)
+	b.MustFprint(buf, ctx)
 	return buf.String()
 }
 
